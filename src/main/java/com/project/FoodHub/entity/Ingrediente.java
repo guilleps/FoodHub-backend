@@ -18,7 +18,7 @@ public class Ingrediente {
     @Column(name = "ingrediente_id")
     private Long idIngrediente;
 
-    @Column(name = "ingrediete", nullable = false)
+    @Column(name = "ingrediente", nullable = false)
     private String ingrediente;
 
     @ManyToOne(fetch = FetchType.LAZY)

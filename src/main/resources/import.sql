@@ -1,0 +1,6 @@
+INSERT INTO colegiado (nombre_colegiado, apellido_paterno_colegiado, apellido_materno_colegiado, codigo_colegiado, cuenta_confirmada) VALUES ('Raul', 'Abanto', 'Acuña', '123556', 0);
+INSERT INTO colegiado (nombre_colegiado, apellido_paterno_colegiado, apellido_materno_colegiado, codigo_colegiado, cuenta_confirmada) VALUES ('Guillermo', 'Sanchez', 'Palacios', '654321', 0);
+INSERT INTO colegiado (nombre_colegiado, apellido_paterno_colegiado, apellido_materno_colegiado, codigo_colegiado, cuenta_confirmada) VALUES ('Diego', 'Campos', 'Bueno', '123789', 0);
+INSERT INTO colegiado (nombre_colegiado, apellido_paterno_colegiado, apellido_materno_colegiado, codigo_colegiado, cuenta_confirmada) VALUES ('Lucia', 'Boy', 'Guillen', '456789', 0);
+INSERT INTO colegiado (nombre_colegiado, apellido_paterno_colegiado, apellido_materno_colegiado, codigo_colegiado, cuenta_confirmada) VALUES ('Dr', 'Livesey', 'Mz', '963852', 0);
+INSERT INTO colegiado (nombre_colegiado, apellido_paterno_colegiado, apellido_materno_colegiado, codigo_colegiado, cuenta_confirmada) VALUES ('Postgre', 'Docker', 'Terraform', '147852', 0);

@@ -32,7 +32,7 @@ public class Creador {
     @Column(name = "correo_electronico", nullable = false, unique = true)
     private String correoElectronico;
 
-    @Column(name = "contraseña", nullable = false)
+    @Column(name = "contrasenia", nullable = false)
     private String contrasenia;
 
     @Column(name = "codigo_colegiatura", nullable = false)

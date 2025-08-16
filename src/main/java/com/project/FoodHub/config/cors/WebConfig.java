@@ -32,7 +32,7 @@ public class WebConfig implements Filter {
         HttpServletRequest request = (HttpServletRequest) servletRequest;
 
         response.setHeader("Access-Control-Allow-Origin", frontUrl);
-        response.setHeader("Access-Control-Allow-Methods", "POST, GET");
+        response.setHeader("Access-Control-Allow-Methods", "POST, GET, PUT, OPTIONS, DELETE, HEAD, PATCH");
         response.setHeader("Access-Control-Allow-Headers", "Content-Type, Authorization, X-Requested-With, credential, X-XSRF-TOKEN");
         response.setHeader("Access-Control-Allow-Credentials", "true");
 

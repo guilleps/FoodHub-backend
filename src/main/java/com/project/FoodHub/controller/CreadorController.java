@@ -3,7 +3,6 @@ package com.project.FoodHub.controller;
 import com.project.FoodHub.dto.CreadorDTO;
 import com.project.FoodHub.dto.MessageResponse;
 import com.project.FoodHub.entity.Creador;
-import com.project.FoodHub.exception.CreadorNoEncontradoException;
 import com.project.FoodHub.exception.FotoPerfilException;
 import com.project.FoodHub.service.ICreadorService;
 import lombok.RequiredArgsConstructor;
@@ -25,6 +24,7 @@ import java.util.concurrent.ExecutionException;
 public class CreadorController {
 
     private final ICreadorService creadorService;
+    private final RestTemplate restTemplate = new RestTemplate();
 
     @GetMapping("/cantidadRecetas")
     public ResponseEntity<Integer> obtenerCantidadRecetasCreadas() {
@@ -55,7 +55,6 @@ public class CreadorController {
             return ResponseEntity.noContent().build();
         }
 
-        RestTemplate restTemplate = new RestTemplate();
         byte[] imageBytes = restTemplate.getForObject(googleDriveUrl, byte[].class);
 
         ByteArrayResource resource = new ByteArrayResource(imageBytes);
