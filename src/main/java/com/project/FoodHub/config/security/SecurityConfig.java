@@ -20,7 +20,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.www.BasicAuthenticationFilter;
-import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
+import org.springframework.security.web.servlet.util.matcher.PathPatternRequestMatcher;
 import org.springframework.security.web.util.matcher.OrRequestMatcher;
 import org.springframework.security.web.util.matcher.RequestMatcher;
 
@@ -48,28 +48,27 @@ public class SecurityConfig {
 
     private RequestMatcher publicEndpoints() {
         return new OrRequestMatcher(
-                new AntPathRequestMatcher("/auth/**"),
-                new AntPathRequestMatcher("/explorar/recetas/**"),
-                new AntPathRequestMatcher("/explorar/{idReceta}"),
-                new AntPathRequestMatcher("/explorar/{idReceta}/imagen"),
-                new AntPathRequestMatcher("/explorar/{idReceta}/foto-autor")
-//                new AntPathRequestMatcher("/v3/api-docs/**"),
-//                new AntPathRequestMatcher("/swagger-ui/**"),
-//                new AntPathRequestMatcher("/swagger-ui.html")
+                PathPatternRequestMatcher.pathPattern("/auth/**"),
+                PathPatternRequestMatcher.pathPattern("/explorar/recetas/**"),
+                PathPatternRequestMatcher.pathPattern("/explorar/{idReceta}"),
+                PathPatternRequestMatcher.pathPattern("/explorar/{idReceta}/imagen"),
+                PathPatternRequestMatcher.pathPattern("/explorar/{idReceta}/foto-autor"),
+                PathPatternRequestMatcher.pathPattern("/v3/api-docs/**"),
+                PathPatternRequestMatcher.pathPattern("/swagger-ui/**"),
+                PathPatternRequestMatcher.pathPattern("/swagger-ui.html")
         );
     }
 
     private RequestMatcher privateEndpoints() {
         return new OrRequestMatcher(
-                new AntPathRequestMatcher("/creador/**"),
-                new AntPathRequestMatcher("/explorar/crear")
+                PathPatternRequestMatcher.pathPattern("/creador/**"),
+                PathPatternRequestMatcher.pathPattern("/explorar/crear")
         );
     }
 
     @Bean
     public AuthenticationProvider authenticationProvider(IUserDetailService userDetailService) {
-        DaoAuthenticationProvider authenticationProvider = new DaoAuthenticationProvider();
-        authenticationProvider.setUserDetailsService(userDetailService);
+        DaoAuthenticationProvider authenticationProvider = new DaoAuthenticationProvider(userDetailService);
         authenticationProvider.setPasswordEncoder(passwordEncoder());
         return authenticationProvider;
     }
