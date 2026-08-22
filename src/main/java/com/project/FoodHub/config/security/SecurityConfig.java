@@ -32,12 +32,12 @@ public class SecurityConfig {
     private final JwtUtils jwtUtils;
 
     @Bean
-    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception{
+    public SecurityFilterChain securityFilterChain(HttpSecurity http) {
         return http
                 .csrf(AbstractHttpConfigurer::disable)
                 .httpBasic(Customizer.withDefaults())
                 .authorizeHttpRequests((authorize) -> authorize
-                        .requestMatchers(publicEndpoints()).permitAll()
+                        .requestMatchers(publicEndpoints(), docEndpoints()).permitAll()
                         .requestMatchers(privateEndpoints()).authenticated()
                         .anyRequest().denyAll())
                 .sessionManagement((session) -> session
@@ -52,10 +52,16 @@ public class SecurityConfig {
                 PathPatternRequestMatcher.pathPattern("/explorar/recetas/**"),
                 PathPatternRequestMatcher.pathPattern("/explorar/{idReceta}"),
                 PathPatternRequestMatcher.pathPattern("/explorar/{idReceta}/imagen"),
-                PathPatternRequestMatcher.pathPattern("/explorar/{idReceta}/foto-autor"),
+                PathPatternRequestMatcher.pathPattern("/explorar/{idReceta}/foto-autor")
+        );
+    }
+
+    private RequestMatcher docEndpoints() {
+        return new OrRequestMatcher(
                 PathPatternRequestMatcher.pathPattern("/v3/api-docs/**"),
                 PathPatternRequestMatcher.pathPattern("/swagger-ui/**"),
-                PathPatternRequestMatcher.pathPattern("/swagger-ui.html")
+                PathPatternRequestMatcher.pathPattern("/swagger-ui.html"),
+                PathPatternRequestMatcher.pathPattern("/swagger-ui-custom.html")
         );
     }
 
@@ -79,7 +85,7 @@ public class SecurityConfig {
     }
 
     @Bean
-    public AuthenticationManager authenticationManager(AuthenticationConfiguration configuration) throws Exception{
+    public AuthenticationManager authenticationManager(AuthenticationConfiguration configuration) {
         return configuration.getAuthenticationManager();
     }
 

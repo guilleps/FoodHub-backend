@@ -36,7 +36,7 @@ public class WebConfig implements Filter {
         response.setHeader("Access-Control-Allow-Headers", "Content-Type, Authorization, X-Requested-With, credential, X-XSRF-TOKEN");
         response.setHeader("Access-Control-Allow-Credentials", "true");
 
-        System.out.println("Solicitud CORS: " + request.getMethod() + " - " + request.getRequestURI());
+        System.out.println("REQUEST: [" + request.getMethod() + "] - METHOD: " + request.getRequestURI());
 
         if ("OPTIONS".equalsIgnoreCase(request.getMethod())) {
             response.setStatus(HttpServletResponse.SC_OK);

@@ -7,6 +7,7 @@ import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 
 import java.util.concurrent.Executor;
 
+// TODO: implement async config for request or processing tasks
 @Configuration
 @EnableAsync
 public class AsyncConfig {
