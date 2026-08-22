@@ -10,6 +10,7 @@ import com.google.auth.http.HttpCredentialsAdapter;
 import com.google.auth.oauth2.GoogleCredentials;
 import com.project.FoodHub.exception.FotoPerfilException;
 import com.project.FoodHub.exception.ImagenNoValidaException;
+import jakarta.annotation.PostConstruct;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -26,23 +27,54 @@ import java.util.*;
 
 @Service
 @Slf4j
-public class UploadImage {
-
-    @Value("${google.drive.folder.id}")
-    private String folderId;
+public class UploadImageService {
 
     private static final JsonFactory JSON_FACTORY = GsonFactory.getDefaultInstance();
-    private final Drive driveService;
 
-    private UploadImage() throws GeneralSecurityException, IOException {
-        this.driveService = createDriveService();
-        log.info(System.getenv("GOOGLE_APPLICATION_CREDENTIALS"));
-        log.info(folderId);
+    private final String folderId;
+    private final String credentialsPath;
+
+    private Drive driveService;
+    private boolean available;
+
+    public UploadImageService(
+            @Value("${google.drive.folder.id}") String folderId,
+            @Value("${google.credentials.path.storage}") String credentialsPath
+    ) {
+        this.folderId = folderId;
+        this.credentialsPath = credentialsPath;
+    }
+
+    @PostConstruct
+    public void init() {
+        try {
+            this.driveService = createDriveService();
+            this.available = true;
+
+            log.info("Google Drive integration initialized successfully");
+
+        } catch (Exception e) {
+            this.driveService = null;
+            this.available = false;
+
+            log.error("Google Drive integration initialization failed: {}", e.getMessage(), e);
+        }
+    }
+
+    public boolean isAvailable() {
+        return available;
     }
 
     private Drive createDriveService() throws GeneralSecurityException, IOException {
 
-        GoogleCredentials credentials = GoogleCredentials.fromStream(new FileInputStream(System.getenv("GOOGLE_APPLICATION_CREDENTIALS"))).createScoped(Collections.singleton(DriveScopes.DRIVE_FILE));
+        GoogleCredentials credentials;
+
+        try(FileInputStream fileInputStream = new FileInputStream(credentialsPath)) {
+
+            credentials = GoogleCredentials
+                    .fromStream(fileInputStream)
+                    .createScoped(Collections.singleton(DriveScopes.DRIVE_FILE));
+        }
 
         return new Drive.Builder(
                 GoogleNetHttpTransport.newTrustedTransport(),
@@ -53,6 +85,7 @@ public class UploadImage {
     }
 
     public String guardarImagen(MultipartFile imagen) throws FotoPerfilException {
+        validarEstadoDeServicio();
 
         String tipoArchivo = Optional.ofNullable(imagen.getContentType()).orElse("");
         List<String> tiposPermitidos = Arrays.asList("image/jpeg", "image/jpg", "image/png");
@@ -70,6 +103,7 @@ public class UploadImage {
 
             String url = uploadImageToDrive(rutaCompleta.toFile());
 
+            // en caso no existen los directorios temporales, los crea
             Path directorioTemporal = Paths.get(System.getProperty("java.io.tmpdir"));
             if (!Files.exists(directorioTemporal)) {
                 Files.createDirectories(directorioTemporal);
@@ -78,6 +112,13 @@ public class UploadImage {
             return url;
         } catch (IOException e) {
             throw new FotoPerfilException("Error al guardar la foto", e);
+        }
+    }
+
+    private void validarEstadoDeServicio() throws FotoPerfilException {
+        if (!available || driveService == null) {
+            log.warn("Attempted image upload while object storage service is unavailable");
+            throw new FotoPerfilException("El servicio de almacenamiento de imágenes no está disponible");
         }
     }
 

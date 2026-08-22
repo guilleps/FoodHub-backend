@@ -7,7 +7,7 @@ import com.project.FoodHub.exception.*;
 import com.project.FoodHub.repository.CreadorRepository;
 import com.project.FoodHub.repository.RecetaRepository;
 import com.project.FoodHub.service.ICreadorService;
-import com.project.FoodHub.service.UploadImage;
+import com.project.FoodHub.service.UploadImageService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.Authentication;
@@ -27,7 +27,7 @@ public class CreadorServiceImpl implements ICreadorService {
 
     private final CreadorRepository creadorRepository;
     private final RecetaRepository recetaRepository;
-    private final UploadImage uploadImage;
+    private final UploadImageService uploadImageService;
 
     @Override
     public Integer obtenerCantidadDeRecetasCreadas() {
@@ -78,7 +78,7 @@ public class CreadorServiceImpl implements ICreadorService {
     @Override
     @Transactional
     public MessageResponse actualizarFotoPerfil(MultipartFile fotoPerfil) throws FotoPerfilException, IOException, ExecutionException, InterruptedException {
-        String nombreArchivo = uploadImage.guardarImagen(fotoPerfil);
+        String nombreArchivo = uploadImageService.guardarImagen(fotoPerfil);
 
         Long idCreador = obtenerIdCreadorAutenticado();
         Creador creador = obtenerCreadorPorId(idCreador);

@@ -19,7 +19,7 @@ import com.project.FoodHub.repository.InstruccionRepository;
 import com.project.FoodHub.repository.RecetaRepository;
 import com.project.FoodHub.service.ICreadorService;
 import com.project.FoodHub.service.IRecetaService;
-import com.project.FoodHub.service.UploadImage;
+import com.project.FoodHub.service.UploadImageService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.security.core.Authentication;
@@ -41,7 +41,7 @@ public class RecetaServiceImpl implements IRecetaService {
     private final IngredienteRepository ingredienteRepository;
     private final InstruccionRepository instruccionRepository;
     private final ICreadorService creadorService;
-    private final UploadImage uploadImage;
+    private final UploadImageService uploadImageService;
 
     @Override
     @Transactional
@@ -51,7 +51,7 @@ public class RecetaServiceImpl implements IRecetaService {
         Creador creador = creadorRepository.findById(idCreador)
                 .orElseThrow(() -> new CreadorNoEncontradoException("Creador no encontrado con ID: " + idCreador));
 
-        String nombreImagen =  uploadImage.guardarImagen(imagen);
+        String nombreImagen =  uploadImageService.guardarImagen(imagen);
 
         Receta receta = Receta.builder()
                 .titulo(recetaRequest.getTitulo())
