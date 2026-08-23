@@ -3,6 +3,7 @@ package com.project.FoodHub.config.cors;
 import jakarta.servlet.*;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;
@@ -10,6 +11,7 @@ import org.springframework.stereotype.Component;
 
 import java.io.IOException;
 
+@Slf4j
 @Component
 @Order(Ordered.HIGHEST_PRECEDENCE)
 public class WebConfig implements Filter {
@@ -36,7 +38,7 @@ public class WebConfig implements Filter {
         response.setHeader("Access-Control-Allow-Headers", "Content-Type, Authorization, X-Requested-With, credential, X-XSRF-TOKEN");
         response.setHeader("Access-Control-Allow-Credentials", "true");
 
-        System.out.println("REQUEST: [" + request.getMethod() + "] - METHOD: " + request.getRequestURI());
+        log.info("METHOD: {} - STATUS CODE: {} - REQUEST: [{}]", request.getMethod(), response.getStatus(), request.getRequestURI());
 
         if ("OPTIONS".equalsIgnoreCase(request.getMethod())) {
             response.setStatus(HttpServletResponse.SC_OK);

@@ -25,6 +25,7 @@ import java.nio.file.Paths;
 import java.security.GeneralSecurityException;
 import java.util.*;
 
+// TODO: update service to other provider (Cloudflare R2)
 @Service
 @Slf4j
 public class UploadImageService {

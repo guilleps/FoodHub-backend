@@ -5,14 +5,12 @@ import com.project.FoodHub.dto.*;
 import com.project.FoodHub.entity.Creador;
 import com.project.FoodHub.enumeration.Rol;
 import com.project.FoodHub.exception.*;
+import com.project.FoodHub.service.EmailService;
 import com.project.FoodHub.service.IColegiadoService;
 import com.project.FoodHub.service.ICreadorService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.mail.SimpleMailMessage;
-import org.springframework.mail.javamail.JavaMailSender;
-import org.springframework.scheduling.annotation.Async;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.authority.AuthorityUtils;
@@ -38,11 +36,8 @@ public class IUserDetailService implements UserDetailsService {
     private final IColegiadoService colegiadoService;
     private final JwtUtils jwtUtils;
     private final PasswordEncoder passwordEncoder;
-    private final JavaMailSender javaMailSender;
+    private final EmailService emailService;
     private final ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(1);
-
-    @Value("${spring.email.sender.user}")
-    private String mailOrigin;
 
     @Value("${frontUrl}")
     private String frontUrl;
@@ -89,14 +84,17 @@ public class IUserDetailService implements UserDetailsService {
     @Transactional
     public ConfirmacionResponse registrar(CreadorRequest request) {
         if (!colegiadoService.validarColegiado(request.getNombre(), request.getApellidoPaterno(), request.getApellidoMaterno(), request.getCodigoColegiatura())) {
+            log.warn("Validación de colegiado fallida para código {}", request.getCodigoColegiatura());
             throw new ColegiadoNoValidoException("No se pudo validar el colegiado, los datos no coinciden.");
         }
 
         if (creadorService.verificarCorreoRegistrado(request.getCorreoElectronico()).isPresent()) {
+            log.warn("Validación de colegiado fallida para código {}", request.getCodigoColegiatura());
             throw new CorreoConfirmadoException("El correo electrónico ya está registrado.");
         }
 
         if (!colegiadoService.isCuentaConfirmada(request.getCodigoColegiatura())) {
+            log.warn("El colegiado ya ha sido registrado {}", request.getCodigoColegiatura());
             throw new CodigoConfirmadoException("Código de colegiado ya registrado");
         }
 
@@ -111,12 +109,11 @@ public class IUserDetailService implements UserDetailsService {
                 request.getCodigoColegiatura()
         );
 
-        log.info(creador.getContrasenia());
-
         creadorService.guardarCreador(creador);
 
         crearCuenta(creador);
 
+        log.info("Cuenta creada exitosamente para el correo: {}", request.getCorreoElectronico());
         return new ConfirmacionResponse("Creación de cuenta exitosa", "success");
     }
 
@@ -130,7 +127,21 @@ public class IUserDetailService implements UserDetailsService {
         creador.setTokenConfirmacion(confirmationToken);
         Creador creadorCreated = creadorService.guardarCreador(creador);
 
-        sendSimpleMessage(creadorCreated.getCorreoElectronico(), confirmationToken);
+        emailService.sendEmail(
+                creadorCreated.getCorreoElectronico(),
+                "Account Verification - FoodHub",
+                """
+                Estimado/a,
+        
+                Gracias por registrarte en nuestra plataforma FoodHub.
+                Por favor, haz clic en el siguiente enlace para confirmar tu cuenta:
+        
+                %s/verificar/%s
+        
+                Saludos,
+                y disfruta de una nueva experiencia.
+                """.formatted(frontUrl, confirmationToken)
+        );
 
         scheduler.schedule(() -> {
             eliminarCreadorSinConfirmar(creador.getCorreoElectronico());
@@ -150,18 +161,6 @@ public class IUserDetailService implements UserDetailsService {
         } catch (Exception e) {
             log.error("Error al eliminar creador no confirmado: ", e);
         }
-    }
-
-    @Async("taskExecutor")
-    public void sendSimpleMessage(String to, String confirmationToken) {
-        String linkConfirmacion = frontUrl + "/verificar/" + confirmationToken;
-
-        SimpleMailMessage message = new SimpleMailMessage();
-        message.setFrom(mailOrigin);
-        message.setTo(to);
-        message.setSubject("Account Verification - FoodHub");
-        message.setText("Estimado/a,\n\nGracias por registrarte en nuestra plataforma 'FoodHub'. Por favor, haz clic en el siguiente enlace para confirmar tu cuenta:\n\n" + linkConfirmacion + "\n\nSaludos,\ny disfruta de una nueva experiencia.");
-        javaMailSender.send(message);
     }
 
     public MessageResponse confirmAccount(String token) {

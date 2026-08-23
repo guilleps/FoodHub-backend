@@ -33,7 +33,7 @@ public class CreadorRequest {
     private String correoElectronico;
 
     @NotBlank(message = "Por favor agrega una contraseña")
-    @Size(max = 15, message = "El correo debe tener máximo 15 caracteres")
+    @Size(max = 15, message = "La contraseña debe tener máximo 15 caracteres")
     @Pattern(regexp = "^(?=.*[0-9])(?=.*[A-Z])[^\\s]+$", message = "La contraseña debe contener al menos un número y una letra mayúscula")
     private String contrasenia;
 

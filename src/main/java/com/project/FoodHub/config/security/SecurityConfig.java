@@ -52,7 +52,8 @@ public class SecurityConfig {
                 PathPatternRequestMatcher.pathPattern("/explorar/recetas/**"),
                 PathPatternRequestMatcher.pathPattern("/explorar/{idReceta}"),
                 PathPatternRequestMatcher.pathPattern("/explorar/{idReceta}/imagen"),
-                PathPatternRequestMatcher.pathPattern("/explorar/{idReceta}/foto-autor")
+                PathPatternRequestMatcher.pathPattern("/explorar/{idReceta}/foto-autor"),
+                PathPatternRequestMatcher.pathPattern("/object-storage/health")
         );
     }
 

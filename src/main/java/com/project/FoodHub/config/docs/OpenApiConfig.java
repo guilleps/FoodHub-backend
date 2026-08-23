@@ -6,6 +6,7 @@ import io.swagger.v3.oas.models.info.Info;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
+// https://github.com/swagger-api/swagger-core/wiki/Swagger-2.X---Annotations
 @Configuration
 public class OpenApiConfig {
 
