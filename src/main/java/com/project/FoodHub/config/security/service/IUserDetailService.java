@@ -39,8 +39,8 @@ public class IUserDetailService implements UserDetailsService {
     private final EmailService emailService;
     private final ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(1);
 
-    @Value("${frontUrl}")
-    private String frontUrl;
+    @Value("${allowedOrigin}")
+    private String allowedOrigin;
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
@@ -140,7 +140,7 @@ public class IUserDetailService implements UserDetailsService {
         
                 Saludos,
                 y disfruta de una nueva experiencia.
-                """.formatted(frontUrl, confirmationToken)
+                """.formatted(allowedOrigin, confirmationToken)
         );
 
         scheduler.schedule(() -> {

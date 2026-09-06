@@ -16,14 +16,6 @@ import java.io.IOException;
 @Order(Ordered.HIGHEST_PRECEDENCE)
 public class WebConfig implements Filter {
 
-    @Value("${frontUrl}")
-    private String frontUrl;
-
-
-    @Override
-    public void init(FilterConfig filterConfig) throws ServletException {
-        // TODO Auto-generated method stub
-    }
 
     @Override
     public void doFilter(ServletRequest servletRequest,
@@ -33,23 +25,15 @@ public class WebConfig implements Filter {
         HttpServletResponse response = (HttpServletResponse) servletResponse;
         HttpServletRequest request = (HttpServletRequest) servletRequest;
 
-        response.setHeader("Access-Control-Allow-Origin", frontUrl);
-        response.setHeader("Access-Control-Allow-Methods", "POST, GET, PUT, OPTIONS, DELETE, HEAD, PATCH");
-        response.setHeader("Access-Control-Allow-Headers", "Content-Type, Authorization, X-Requested-With, credential, X-XSRF-TOKEN");
-        response.setHeader("Access-Control-Allow-Credentials", "true");
+        filterChain.doFilter(servletRequest, servletResponse);
 
-        log.info("METHOD: {} - STATUS CODE: {} - REQUEST: [{}]", request.getMethod(), response.getStatus(), request.getRequestURI());
+        log.info(
+                "METHOD: {} - STATUS CODE: {} - REQUEST: [{}] - ORIGIN: [{}]",
+                request.getMethod(),
+                response.getStatus(),
+                request.getRequestURI(),
+                request.getHeader("Origin")
+        );
 
-        if ("OPTIONS".equalsIgnoreCase(request.getMethod())) {
-            response.setStatus(HttpServletResponse.SC_OK);
-        } else {
-          filterChain.doFilter(servletRequest, servletResponse);
-        }
-
-    }
-
-    @Override
-    public void destroy() {
-        // TODO Auto-generated method stub
     }
 }
